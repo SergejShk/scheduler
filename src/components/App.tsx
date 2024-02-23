@@ -4,9 +4,9 @@ import Calendar from "./Calendar";
 
 const App: FC = () => {
 	return (
-		<div>
+		<>
 			<Calendar />
-		</div>
+		</>
 	);
 };
 
