@@ -1,15 +1,32 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
 
-import { days, weekDays } from "../utils/constants";
+import Days from "./Days";
+
+import { monthes } from "../../utils/constants";
 
 const Calendar: FC = () => {
+	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+
 	const prevMonthClick = () => {
-		console.log("prev month click");
+		setCurrentMonth((prev) => {
+			if (prev === 0) {
+				setCurrentYear((prevYear) => prevYear - 1);
+				return 11;
+			}
+			return prev - 1;
+		});
 	};
 
 	const nextMonthClick = () => {
-		console.log("next month click");
+		setCurrentMonth((prev) => {
+			if (prev === 11) {
+				setCurrentYear((prevYear) => prevYear + 1);
+				return 0;
+			}
+			return prev + 1;
+		});
 	};
 
 	return (
@@ -17,21 +34,9 @@ const Calendar: FC = () => {
 			<Heading>
 				<PrevArrow type="button" onClick={prevMonthClick} />
 				<NextArrow type="button" onClick={nextMonthClick} />
-				<CurrentDate>September 2018</CurrentDate>
+				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 			</Heading>
-
-			<CalendarBody>
-				<WeekDaysList>
-					{weekDays.map((day, idx) => (
-						<WeekDaysItem key={idx}>{day}</WeekDaysItem>
-					))}
-				</WeekDaysList>
-				<DaysList>
-					{days.map((day, idx) => (
-						<DaysItem key={idx}>{day}</DaysItem>
-					))}
-				</DaysList>
-			</CalendarBody>
+			<Days currentYear={currentYear} currentMonth={currentMonth} />
 		</CalendarStyled>
 	);
 };
@@ -76,38 +81,4 @@ const CurrentDate = styled.p`
 	font-size: 24px;
 	font-weight: 500;
 	text-align: center;
-`;
-
-const CalendarBody = styled.div`
-	padding: 0 15px;
-`;
-
-const CalendarList = styled.ul`
-	display: flex;
-	flex-wrap: wrap;
-	text-align: center;
-`;
-
-const CalendarItem = styled.li`
-	width: calc(100% / 7);
-	cursor: grab;
-`;
-
-const WeekDaysList = styled(CalendarList)``;
-
-const WeekDaysItem = styled(CalendarItem)`
-	font-weight: 500;
-`;
-
-const DaysList = styled(CalendarList)`
-	margin-top: 15px;
-	gap: 5px;
-	text-align: left;
-`;
-
-const DaysItem = styled(CalendarItem)`
-	height: 100px;
-	width: calc(100% / 7 - 5px - 10px + 0.7px);
-	background-color: #e2e2e2;
-	padding: 5px;
 `;
