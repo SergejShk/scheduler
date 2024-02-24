@@ -3,20 +3,23 @@ import styled from "styled-components";
 
 import Days from "./Days";
 
+import Modal from "../common/Modal";
+
 import { getDaysList } from "../../utils/calendar";
 import { fakeTasks, monthes } from "../../utils/constants";
 
-import { ICardDay } from "../../interfaces/calendar";
+import { ICardDay, ITask } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
+	const [tasks, setTasks] = useState<ITask[]>(fakeTasks);
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
-
 	const [daysList, setDaysList] = useState<ICardDay[]>([]);
+	const [isOpenModal, setIsOpenModal] = useState(false);
 
 	useEffect(() => {
-		setDaysList(getDaysList({ currentYear, currentMonth, tasks: fakeTasks }));
-	}, [currentYear, currentMonth, fakeTasks]);
+		setDaysList(getDaysList({ currentYear, currentMonth, tasks }));
+	}, [currentYear, currentMonth, tasks]);
 
 	const prevMonthClick = () => {
 		setCurrentMonth((prev) => {
@@ -38,6 +41,9 @@ const Calendar: FC = () => {
 		});
 	};
 
+	const onModalOpen = () => setIsOpenModal(true);
+	const onModalClose = () => setIsOpenModal(false);
+
 	return (
 		<CalendarStyled>
 			<Heading>
@@ -46,7 +52,9 @@ const Calendar: FC = () => {
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 			</Heading>
 
-			<Days daysList={daysList} setDaysList={setDaysList} />
+			<Days daysList={daysList} setDaysList={setDaysList} onModalOpen={onModalOpen} />
+
+			{isOpenModal && <Modal onModalClose={onModalClose}>hello modal</Modal>}
 		</CalendarStyled>
 	);
 };

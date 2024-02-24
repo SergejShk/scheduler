@@ -8,9 +8,10 @@ import { ICardDay, ITask } from "../../interfaces/calendar";
 interface IProps {
 	daysList: ICardDay[];
 	setDaysList: React.Dispatch<React.SetStateAction<ICardDay[]>>;
+	onModalOpen: () => void;
 }
 
-const Days: FC<IProps> = ({ daysList, setDaysList }) => {
+const Days: FC<IProps> = ({ daysList, setDaysList, onModalOpen }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
@@ -113,6 +114,7 @@ const Days: FC<IProps> = ({ daysList, setDaysList }) => {
 					<DaysItem
 						key={id}
 						id={id}
+						onClick={onModalOpen}
 						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
 						onDragOver={handleDragOver}
 					>
@@ -176,6 +178,7 @@ const DaysList = styled(CalendarList)`
 `;
 
 const DaysItem = styled(CalendarItem)<{ $isInactive?: boolean }>`
+	cursor: pointer;
 	height: 100px;
 	width: calc(100% / 7 - 5px - 10px + 0.7px);
 	background-color: #d7d6d6;
