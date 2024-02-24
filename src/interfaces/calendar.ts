@@ -8,5 +8,11 @@ export interface ITask {
 export interface ICardDay {
 	id: string;
 	title: string;
-	tasks?: ITask[];
+	tasks: ITask[];
+}
+
+export interface IGetCardDaysList {
+	currentYear: number;
+	currentMonth: number;
+	tasks: ITask[];
 }

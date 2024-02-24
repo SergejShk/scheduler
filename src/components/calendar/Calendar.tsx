@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 import Days from "./Days";
 
-import { monthes } from "../../utils/constants";
+import { fakeTasks, monthes } from "../../utils/constants";
 
 const Calendar: FC = () => {
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -36,7 +36,7 @@ const Calendar: FC = () => {
 				<NextArrow type="button" onClick={nextMonthClick} />
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 			</Heading>
-			<Days currentYear={currentYear} currentMonth={currentMonth} />
+			<Days currentYear={currentYear} currentMonth={currentMonth} tasks={fakeTasks} />
 		</CalendarStyled>
 	);
 };

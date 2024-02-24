@@ -1,128 +1,110 @@
-import { FC, ReactNode, useState } from "react";
+import { FC, useState } from "react";
 import styled from "styled-components";
 
-import { shortMonthes, weekDays } from "../../utils/constants";
+import { weekDays } from "../../utils/constants";
+import { getDaysList } from "../../utils/calendar";
 
-import { ITask } from "../../interfaces/calendar";
+import { ICardDay, ITask } from "../../interfaces/calendar";
 
 interface IProps {
 	currentYear: number;
 	currentMonth: number;
+	tasks: ITask[];
 }
 
-const fakeTasks = [
-	{ id: "1", date: "02/02/2024", description: "task 1", labels: ["green"] },
-	{ id: "2", date: "04/02/2024", description: "task 2", labels: ["yellow", "red"] },
-	{ id: "3", date: "05/02/2024", description: "task 3", labels: ["yellow", "red"] },
-	{ id: "4", date: "05/02/2024", description: "task 3", labels: ["violet"] },
-	{ id: "5", date: "05/02/2024", description: "task 3", labels: ["green"] },
-	{ id: "6", date: "05/02/2024", description: "task 3", labels: ["blue"] },
-	{ id: "7", date: "06/02/2024", description: "task 3", labels: ["yellow", "red", "orange", "blue"] },
-];
+const Days: FC<IProps> = ({ currentYear, currentMonth, tasks }) => {
+	const [daysList, setDaysList] = useState<ICardDay[]>(() =>
+		getDaysList({ currentYear, currentMonth, tasks: tasks })
+	);
+	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
+	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
-const Days: FC<IProps> = ({ currentYear, currentMonth }) => {
-	const [tasks, setTasks] = useState<ITask[]>(fakeTasks);
+	const updateItemsListOnSameCard = (taskList: ITask[], task: ITask) => {
+		return taskList.map((item) => {
+			if (currentTask && item.id === task.id) {
+				return currentTask;
+			}
 
-	const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-	const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-	const lastDayOfMonth = new Date(currentYear, currentMonth, lastDateOfMonth).getDay();
-	const lastDateOfPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
-	const prevMonth = new Date(currentYear, currentMonth, 0).getMonth();
-	const nextMonth = new Date(currentYear, currentMonth + 1, 1).getMonth();
+			if (currentTask && item.id === currentTask.id) {
+				return task;
+			}
 
-	const days: ReactNode[] = [];
+			return item;
+		});
+	};
 
-	for (let i = firstDayOfMonth; i > 0; i -= 1) {
-		const day = lastDateOfPrevMonth - i + 1;
-		const year = prevMonth === 11 ? currentYear - 1 : currentYear;
-		const localeDate = new Date(year, prevMonth, day);
-		const id = localeDate.toLocaleDateString();
-		const title = i === 1 ? `${day} ${shortMonthes[prevMonth]}` : String(day);
+	const replaceItems = (taskList: ITask[], itemAdd: ITask, itemDelete: ITask) => {
+		return taskList.map((item) => {
+			if (item.id === itemDelete.id) {
+				return { ...itemAdd, date: itemDelete.date };
+			}
 
-		days.push(
-			<DaysItem key={id} id={id} $isInactive>
-				<p>{title}</p>
-				<TaskList>
-					{tasks.map((task) =>
-						task.date === id ? (
-							<TaskItem key={task.id} id={task.id}>
-								{task.labels.length > 0 && (
-									<LabelList>
-										{task.labels.map((label) => (
-											<LabelItem key={label} color={label} />
-										))}
-									</LabelList>
-								)}
-								<p>{task.description}</p>
-							</TaskItem>
-						) : null
-					)}
-				</TaskList>
-			</DaysItem>
+			return item;
+		});
+	};
+
+	const handleDragStart = (currentDayTaskList: ICardDay, task: ITask) => {
+		setCurrentTaskList(currentDayTaskList);
+		setCurrentTask(task);
+	};
+
+	const handleDropItem = (e: React.DragEvent<HTMLLIElement>, taskList: ICardDay, task: ITask) => {
+		e.preventDefault();
+		if (!currentTaskList || !currentTask) return;
+
+		setDaysList((prev) =>
+			prev.map((list) => {
+				if (list.id === taskList.id && list.id === currentTaskList.id) {
+					const updatedItems = updateItemsListOnSameCard(list.tasks, task);
+					return { ...list, tasks: updatedItems };
+				}
+
+				if (list.id === taskList.id && list.id !== currentTaskList.id) {
+					const updatedItems = replaceItems(list.tasks, currentTask, task);
+					return { ...list, tasks: updatedItems };
+				}
+
+				if (list.id !== taskList.id && list.id === currentTaskList.id) {
+					const updatedItems = replaceItems(list.tasks, task, currentTask);
+					return { ...list, tasks: updatedItems };
+				}
+
+				return list;
+			})
 		);
-	}
+	};
 
-	for (let i = 1; i <= lastDateOfMonth; i += 1) {
-		const day = i;
-		const localeDate = new Date(currentYear, currentMonth, day);
-		const id = localeDate.toLocaleDateString();
-		const title = i === 1 || i === lastDateOfMonth ? `${day} ${shortMonthes[currentMonth]}` : String(day);
+	const handleDropBoard = (e: React.DragEvent<HTMLLIElement>, taskList: ICardDay) => {
+		e.preventDefault();
 
-		days.push(
-			<DaysItem key={id} id={id}>
-				<p>{title}</p>
-				<TaskList>
-					{tasks.map((task) =>
-						task.date === id ? (
-							<TaskItem key={task.id} id={task.id}>
-								{task.labels.length > 0 && (
-									<LabelList>
-										{task.labels.map((label) => (
-											<LabelItem key={label} color={label} />
-										))}
-									</LabelList>
-								)}
-								<p>{task.description}</p>
-							</TaskItem>
-						) : null
-					)}
-				</TaskList>
-			</DaysItem>
+		if (!currentTaskList || !currentTask) return;
+
+		const target = e.target as HTMLElement;
+		if (target.classList.contains("task")) return;
+
+		const updatedTask = { ...currentTask, date: taskList.id };
+
+		taskList.tasks.push(updatedTask);
+		const currentItemIndex = currentTaskList.tasks.indexOf(currentTask);
+		currentTaskList.tasks.splice(currentItemIndex, 1);
+
+		setDaysList((prev) =>
+			prev.map((list) => {
+				if (list.id === taskList.id) {
+					return taskList;
+				}
+				if (list.id === currentTaskList.id) {
+					return currentTaskList;
+				}
+
+				return list;
+			})
 		);
-	}
+	};
 
-	for (let i = lastDayOfMonth; i < 6; i += 1) {
-		const day = i - lastDayOfMonth + 1;
-		const year = nextMonth === 0 ? currentYear + 1 : currentYear;
-		const localeDate = new Date(year, nextMonth, day);
-		const id = localeDate.toLocaleDateString();
-		const title =
-			i === lastDayOfMonth
-				? `${i - lastDayOfMonth + 1} ${shortMonthes[nextMonth]}`
-				: String(i - lastDayOfMonth + 1);
-
-		days.push(
-			<DaysItem key={id} id={id} $isInactive>
-				<p>{title}</p>
-				<TaskList>
-					{tasks.map((task) =>
-						task.date === id ? (
-							<TaskItem key={task.id} id={task.id}>
-								{task.labels.length > 0 && (
-									<LabelList>
-										{task.labels.map((label) => (
-											<LabelItem key={label} color={label} />
-										))}
-									</LabelList>
-								)}
-								<p>{task.description}</p>
-							</TaskItem>
-						) : null
-					)}
-				</TaskList>
-			</DaysItem>
-		);
-	}
+	const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
+		e.preventDefault();
+	};
 
 	return (
 		<DaysStyled>
@@ -131,7 +113,41 @@ const Days: FC<IProps> = ({ currentYear, currentMonth }) => {
 					<WeekDaysItem key={idx}>{day}</WeekDaysItem>
 				))}
 			</WeekDaysList>
-			<DaysList>{days.concat()}</DaysList>
+			<DaysList>
+				{daysList.map(({ id, title, tasks }) => (
+					<DaysItem
+						key={id}
+						id={id}
+						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
+						onDragOver={handleDragOver}
+					>
+						<p>{title}</p>
+
+						<TaskList>
+							{tasks.map((task) => (
+								<TaskItem
+									key={task.id}
+									id={task.id}
+									className="task"
+									draggable={true}
+									onDragStart={() => handleDragStart({ id, title, tasks }, task)}
+									onDrop={(e) => handleDropItem(e, { id, title, tasks }, task)}
+									onDragOver={handleDragOver}
+								>
+									{task.labels.length > 0 && (
+										<LabelList>
+											{task.labels.map((label) => (
+												<LabelItem key={label} className="task" color={label} />
+											))}
+										</LabelList>
+									)}
+									<p className="task">{task.description}</p>
+								</TaskItem>
+							))}
+						</TaskList>
+					</DaysItem>
+				))}
+			</DaysList>
 		</DaysStyled>
 	);
 };

@@ -1,3 +1,5 @@
+import { ITask } from "../interfaces/calendar";
+
 export const monthes = [
 	"January",
 	"February",
@@ -66,4 +68,14 @@ export const days = [
 	"29",
 	"30",
 	"1",
+];
+
+export const fakeTasks: ITask[] = [
+	{ id: "1", date: "02/02/2024", description: "task 1", labels: ["green"] },
+	{ id: "2", date: "04/02/2024", description: "task 2", labels: ["yellow", "red"] },
+	{ id: "3", date: "05/02/2024", description: "task 3", labels: ["yellow", "red"] },
+	{ id: "4", date: "05/02/2024", description: "task 4", labels: ["violet"] },
+	{ id: "5", date: "05/02/2024", description: "task 5", labels: ["green"] },
+	{ id: "6", date: "05/02/2024", description: "task 6", labels: ["blue"] },
+	{ id: "7", date: "06/02/2024", description: "task 7", labels: ["yellow", "red", "orange", "blue"] },
 ];
