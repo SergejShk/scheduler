@@ -1,13 +1,22 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 
 import Days from "./Days";
 
+import { getDaysList } from "../../utils/calendar";
 import { fakeTasks, monthes } from "../../utils/constants";
+
+import { ICardDay } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+
+	const [daysList, setDaysList] = useState<ICardDay[]>([]);
+
+	useEffect(() => {
+		setDaysList(getDaysList({ currentYear, currentMonth, tasks: fakeTasks }));
+	}, [currentYear, currentMonth, fakeTasks]);
 
 	const prevMonthClick = () => {
 		setCurrentMonth((prev) => {
@@ -36,7 +45,8 @@ const Calendar: FC = () => {
 				<NextArrow type="button" onClick={nextMonthClick} />
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 			</Heading>
-			<Days currentYear={currentYear} currentMonth={currentMonth} tasks={fakeTasks} />
+
+			<Days daysList={daysList} setDaysList={setDaysList} />
 		</CalendarStyled>
 	);
 };

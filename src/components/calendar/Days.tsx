@@ -2,20 +2,15 @@ import { FC, useState } from "react";
 import styled from "styled-components";
 
 import { weekDays } from "../../utils/constants";
-import { getDaysList } from "../../utils/calendar";
 
 import { ICardDay, ITask } from "../../interfaces/calendar";
 
 interface IProps {
-	currentYear: number;
-	currentMonth: number;
-	tasks: ITask[];
+	daysList: ICardDay[];
+	setDaysList: React.Dispatch<React.SetStateAction<ICardDay[]>>;
 }
 
-const Days: FC<IProps> = ({ currentYear, currentMonth, tasks }) => {
-	const [daysList, setDaysList] = useState<ICardDay[]>(() =>
-		getDaysList({ currentYear, currentMonth, tasks: tasks })
-	);
+const Days: FC<IProps> = ({ daysList, setDaysList }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
