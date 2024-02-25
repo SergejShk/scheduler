@@ -10,7 +10,12 @@ import { labelColors } from "../../utils/constants";
 
 import { ITaskFormValues } from "../../interfaces/calendar";
 
-const TaskForm: FC = () => {
+interface IProps {
+	isLoading: boolean;
+	onSaveClick: (values: ITaskFormValues) => void;
+}
+
+const TaskForm: FC<IProps> = ({ isLoading, onSaveClick }) => {
 	const { control, register, handleSubmit } = useForm<ITaskFormValues>();
 
 	const descriptionValue = useWatch({
@@ -18,12 +23,8 @@ const TaskForm: FC = () => {
 		control,
 	});
 
-	const onSubmitForm = (formValues: ITaskFormValues) => {
-		console.log(formValues);
-	};
-
 	return (
-		<FormStyled onSubmit={handleSubmit(onSubmitForm)}>
+		<FormStyled onSubmit={handleSubmit(onSaveClick)}>
 			<BlockTitle>Labels</BlockTitle>
 			<LabelsList>
 				{labelColors.map((label) => (
@@ -38,7 +39,7 @@ const TaskForm: FC = () => {
 			<Textarea name="description" register={register} value={descriptionValue} placeholder="Type..." />
 
 			<ButtonWrapper>
-				<Button>Save</Button>
+				<Button disabled={isLoading}>Save</Button>
 			</ButtonWrapper>
 		</FormStyled>
 	);

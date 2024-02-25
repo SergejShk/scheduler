@@ -8,7 +8,7 @@ import { ICardDay, ITask } from "../../interfaces/calendar";
 interface IProps {
 	daysList: ICardDay[];
 	setTasks: React.Dispatch<React.SetStateAction<ITask[]>>;
-	onModalOpen: () => void;
+	onModalOpen: (cardId: string) => void;
 }
 
 const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
@@ -122,7 +122,7 @@ const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 					<DaysItem
 						key={id}
 						id={id}
-						onClick={onModalOpen}
+						onClick={() => onModalOpen(id)}
 						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
 						onDragOver={handleDragOver}
 					>

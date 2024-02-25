@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import styled from "styled-components";
 
 import Days from "./Days";
@@ -8,15 +9,22 @@ import TaskForm from "../tasks/TaskForm";
 import Loader from "../common/Loader";
 import Modal from "../common/Modal";
 
+import { useAuthContext } from "../../context/AuthContext";
+
+import { updateTasksApi } from "../../services/tasks/updateTasks";
+
 import { useLogOut } from "../../hooks/mutations/auth/useLogout";
 import { useGetTasks } from "../../hooks/mutations/tasks/useGetTasks";
 
 import { getDaysList } from "../../utils/calendar";
+import { addTaskToCard, getTasksFromDaysList } from "../../utils/tasks";
 import { monthes } from "../../utils/constants";
 
-import { ICardDay, ITask } from "../../interfaces/calendar";
+import { ICardDay, ITask, ITaskFormValues } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
+	const { auth } = useAuthContext();
+
 	const { mutate: logOut, isPending: isPendingLogOut } = useLogOut();
 	const { mutate: getTasks, data: tasksData, isPending: isPendingTasks } = useGetTasks();
 
@@ -25,6 +33,8 @@ const Calendar: FC = () => {
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 	const [daysList, setDaysList] = useState<ICardDay[]>([]);
 	const [isOpenModal, setIsOpenModal] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [clickedCardId, seClickedCardId] = useState("");
 
 	useEffect(() => {
 		getTasks();
@@ -64,8 +74,44 @@ const Calendar: FC = () => {
 		});
 	};
 
-	const onModalOpen = () => setIsOpenModal(true);
-	const onModalClose = () => setIsOpenModal(false);
+	const onModalOpen = (cardId: string) => {
+		seClickedCardId(cardId);
+		setIsOpenModal(true);
+	};
+
+	const onModalClose = () => {
+		seClickedCardId("");
+		setIsOpenModal(false);
+	};
+
+	const createTask = (formValues: ITaskFormValues) => {
+		if (!tasksData?.data.id) return;
+
+		const newTask = {
+			id: uuidv4(),
+			date: clickedCardId,
+			description: formValues.description,
+			labels: formValues.labels,
+		};
+
+		const updatedDaysList = addTaskToCard(daysList, newTask, clickedCardId);
+		const tasks = getTasksFromDaysList(updatedDaysList);
+
+		const payload = {
+			id: tasksData?.data.id,
+			userId: auth.id,
+			tasks,
+		};
+
+		setIsLoading(true);
+		updateTasksApi(payload)
+			.then(() => {
+				setDaysList(updatedDaysList);
+				onModalClose();
+			})
+			.catch((err) => console.log(err))
+			.finally(() => setIsLoading(false));
+	};
 
 	if (isPendingTasks) {
 		<Loader />;
@@ -87,7 +133,7 @@ const Calendar: FC = () => {
 
 			{isOpenModal && (
 				<Modal onModalClose={onModalClose}>
-					<TaskForm />
+					<TaskForm onSaveClick={createTask} isLoading={isLoading} />
 				</Modal>
 			)}
 		</CalendarStyled>
