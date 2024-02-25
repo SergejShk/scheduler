@@ -21,3 +21,9 @@ export interface ITaskFormValues {
 	labels: string[];
 	description: string;
 }
+
+export interface IUpdateTasksBody {
+	id: number;
+	tasks: ITask[];
+	userId: number;
+}

@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Input from "../common/Input";
 import { Button } from "../common/Button";
 
-import { useLogin } from "../../hooks/mutations/useLogin";
+import { useLogin } from "../../hooks/mutations/auth/useLogin";
 import { Link } from "react-router-dom";
 
 export interface FormValues {

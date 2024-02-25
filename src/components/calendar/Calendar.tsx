@@ -5,31 +5,44 @@ import Days from "./Days";
 
 import TaskForm from "../tasks/TaskForm";
 
+import Loader from "../common/Loader";
 import Modal from "../common/Modal";
 
-import { useLogOut } from "../../hooks/mutations/useLogout";
+import { useLogOut } from "../../hooks/mutations/auth/useLogout";
+import { useGetTasks } from "../../hooks/mutations/tasks/useGetTasks";
 
 import { getDaysList } from "../../utils/calendar";
-import { fakeTasks, monthes } from "../../utils/constants";
+import { monthes } from "../../utils/constants";
 
 import { ICardDay, ITask } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
-	const [tasks, setTasks] = useState<ITask[]>(fakeTasks);
+	const { mutate: logOut, isPending: isPendingLogOut } = useLogOut();
+	const { mutate: getTasks, data: tasksData, isPending: isPendingTasks } = useGetTasks();
+
+	const [tasks, setTasks] = useState<ITask[]>([]);
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 	const [daysList, setDaysList] = useState<ICardDay[]>([]);
 	const [isOpenModal, setIsOpenModal] = useState(false);
 
-	const { mutate, isPending } = useLogOut();
+	useEffect(() => {
+		getTasks();
+	}, []);
 
-	const handleLogOutClick = () => {
-		mutate();
-	};
+	useEffect(() => {
+		if (!tasksData?.data) return;
+
+		setTasks(tasksData.data.tasks);
+	}, [tasksData]);
 
 	useEffect(() => {
 		setDaysList(getDaysList({ currentYear, currentMonth, tasks }));
 	}, [currentYear, currentMonth, tasks]);
+
+	const handleLogOutClick = () => {
+		logOut();
+	};
 
 	const prevMonthClick = () => {
 		setCurrentMonth((prev) => {
@@ -54,6 +67,10 @@ const Calendar: FC = () => {
 	const onModalOpen = () => setIsOpenModal(true);
 	const onModalClose = () => setIsOpenModal(false);
 
+	if (isPendingTasks) {
+		<Loader />;
+	}
+
 	return (
 		<CalendarStyled>
 			<Heading>
@@ -61,7 +78,7 @@ const Calendar: FC = () => {
 				<NextArrow type="button" onClick={nextMonthClick} />
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 
-				<LogOutBtn type="button" onClick={handleLogOutClick} disabled={isPending}>
+				<LogOutBtn type="button" onClick={handleLogOutClick} disabled={isPendingLogOut}>
 					Log out
 				</LogOutBtn>
 			</Heading>

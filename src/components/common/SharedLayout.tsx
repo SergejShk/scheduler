@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 import Loader from "./Loader";
 
-import { useGetMe } from "../../hooks/mutations/useGetMe";
+import { useGetMe } from "../../hooks/mutations/auth/useGetMe";
 
 const SharedLayout: FC = () => {
 	const { mutate: getMe, isPending } = useGetMe();

@@ -1,12 +1,12 @@
 import { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 
-import { useAuthContext } from "../../context/AuthContext";
+import { useAuthContext } from "../../../context/AuthContext";
 
-import { getMeApi } from "../../services/auth/getMe";
+import { getMeApi } from "../../../services/auth/getMe";
 
-import { ApiError, ApiResult } from "../../interfaces/api";
-import { IUser } from "../../interfaces/auth";
+import { ApiError, ApiResult } from "../../../interfaces/api";
+import { IUser } from "../../../interfaces/auth";
 
 export const useGetMe = () => {
 	const { setAuth } = useAuthContext();
