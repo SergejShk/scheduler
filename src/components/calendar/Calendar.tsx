@@ -52,7 +52,7 @@ const Calendar: FC = () => {
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
 			</Heading>
 
-			<Days daysList={daysList} setDaysList={setDaysList} onModalOpen={onModalOpen} />
+			<Days daysList={daysList} setTasks={setTasks} onModalOpen={onModalOpen} />
 
 			{isOpenModal && <Modal onModalClose={onModalClose}>hello modal</Modal>}
 		</CalendarStyled>

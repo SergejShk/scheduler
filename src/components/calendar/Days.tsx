@@ -7,11 +7,11 @@ import { ICardDay, ITask } from "../../interfaces/calendar";
 
 interface IProps {
 	daysList: ICardDay[];
-	setDaysList: React.Dispatch<React.SetStateAction<ICardDay[]>>;
+	setTasks: React.Dispatch<React.SetStateAction<ITask[]>>;
 	onModalOpen: () => void;
 }
 
-const Days: FC<IProps> = ({ daysList, setDaysList, onModalOpen }) => {
+const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
@@ -48,26 +48,30 @@ const Days: FC<IProps> = ({ daysList, setDaysList, onModalOpen }) => {
 		e.preventDefault();
 		if (!currentTaskList || !currentTask) return;
 
-		setDaysList((prev) =>
-			prev.map((list) => {
-				if (list.id === taskList.id && list.id === currentTaskList.id) {
-					const updatedItems = updateItemsListOnSameCard(list.tasks, task);
-					return { ...list, tasks: updatedItems };
-				}
+		const updatedDaysList = daysList.map((day) => {
+			if (day.id === taskList.id && day.id === currentTaskList.id) {
+				const updatedItems = updateItemsListOnSameCard(day.tasks, task);
+				return { ...day, tasks: updatedItems };
+			}
 
-				if (list.id === taskList.id && list.id !== currentTaskList.id) {
-					const updatedItems = replaceItems(list.tasks, currentTask, task);
-					return { ...list, tasks: updatedItems };
-				}
+			if (day.id === taskList.id && day.id !== currentTaskList.id) {
+				const updatedItems = replaceItems(day.tasks, currentTask, task);
+				return { ...day, tasks: updatedItems };
+			}
 
-				if (list.id !== taskList.id && list.id === currentTaskList.id) {
-					const updatedItems = replaceItems(list.tasks, task, currentTask);
-					return { ...list, tasks: updatedItems };
-				}
+			if (day.id !== taskList.id && day.id === currentTaskList.id) {
+				const updatedItems = replaceItems(day.tasks, task, currentTask);
+				return { ...day, tasks: updatedItems };
+			}
 
-				return list;
-			})
-		);
+			return day;
+		});
+
+		const updatedTasks = updatedDaysList.reduce((acc: ITask[], day: ICardDay) => {
+			return [...acc, ...day.tasks];
+		}, []);
+
+		setTasks(updatedTasks);
 	};
 
 	const handleDropBoard = (e: React.DragEvent<HTMLLIElement>, taskList: ICardDay) => {
@@ -84,18 +88,22 @@ const Days: FC<IProps> = ({ daysList, setDaysList, onModalOpen }) => {
 		const currentItemIndex = currentTaskList.tasks.indexOf(currentTask);
 		currentTaskList.tasks.splice(currentItemIndex, 1);
 
-		setDaysList((prev) =>
-			prev.map((list) => {
-				if (list.id === taskList.id) {
-					return taskList;
-				}
-				if (list.id === currentTaskList.id) {
-					return currentTaskList;
-				}
+		const updatedDaysList = daysList.map((day) => {
+			if (day.id === taskList.id) {
+				return taskList;
+			}
+			if (day.id === currentTaskList.id) {
+				return currentTaskList;
+			}
 
-				return list;
-			})
-		);
+			return day;
+		});
+
+		const updatedTasks = updatedDaysList.reduce((acc: ITask[], day: ICardDay) => {
+			return [...acc, ...day.tasks];
+		}, []);
+
+		setTasks(updatedTasks);
 	};
 
 	const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {
