@@ -7,6 +7,8 @@ import TaskForm from "../tasks/TaskForm";
 
 import Modal from "../common/Modal";
 
+import { useLogOut } from "../../hooks/mutations/useLogout";
+
 import { getDaysList } from "../../utils/calendar";
 import { fakeTasks, monthes } from "../../utils/constants";
 
@@ -18,6 +20,12 @@ const Calendar: FC = () => {
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 	const [daysList, setDaysList] = useState<ICardDay[]>([]);
 	const [isOpenModal, setIsOpenModal] = useState(false);
+
+	const { mutate, isPending } = useLogOut();
+
+	const handleLogOutClick = () => {
+		mutate();
+	};
 
 	useEffect(() => {
 		setDaysList(getDaysList({ currentYear, currentMonth, tasks }));
@@ -52,6 +60,10 @@ const Calendar: FC = () => {
 				<PrevArrow type="button" onClick={prevMonthClick} />
 				<NextArrow type="button" onClick={nextMonthClick} />
 				<CurrentDate>{`${monthes[currentMonth]} ${currentYear}`}</CurrentDate>
+
+				<LogOutBtn type="button" onClick={handleLogOutClick} disabled={isPending}>
+					Log out
+				</LogOutBtn>
 			</Heading>
 
 			<Days daysList={daysList} setTasks={setTasks} onModalOpen={onModalOpen} />
@@ -76,7 +88,7 @@ const Heading = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 5px;
+	padding: 5px 15px;
 `;
 
 const PrevArrow = styled.button`
@@ -105,4 +117,18 @@ const CurrentDate = styled.p`
 	font-size: 24px;
 	font-weight: 500;
 	text-align: center;
+`;
+
+const LogOutBtn = styled.button`
+	cursor: pointer;
+	font-size: 18px;
+	font-weight: 500;
+	border-style: none;
+	background-color: transparent;
+	margin-left: auto;
+	text-decoration: underline;
+
+	&:disabled {
+		cursor: auto;
+	}
 `;
