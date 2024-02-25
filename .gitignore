@@ -1,10 +1,6 @@
 # dependencies
 node_modules
 
-# sst
-.sst
-.build
-
 # opennext
 .open-next
 
