@@ -13,3 +13,27 @@ export const ButtonCross = styled.button`
 	align-self: center;
 	transition: background-color 0.2s ease;
 `;
+
+export const Button = styled.button`
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 18px;
+	font-weight: 600;
+	letter-spacing: 0.8px;
+	border-radius: 4px;
+	padding: 3px 10px;
+	color: #484848;
+	background-color: #b6d9ee;
+	transition: background-color 0.2s ease;
+
+	&:hover {
+		background-color: #94caec;
+	}
+
+	&:disabled {
+		cursor: auto;
+		background-color: #b6d9ee;
+	}
+`;

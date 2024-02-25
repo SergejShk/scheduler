@@ -16,3 +16,8 @@ export interface IGetCardDaysList {
 	currentMonth: number;
 	tasks: ITask[];
 }
+
+export interface ITaskFormValues {
+	labels: string[];
+	description: string;
+}

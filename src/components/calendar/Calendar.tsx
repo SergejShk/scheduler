@@ -3,6 +3,8 @@ import styled from "styled-components";
 
 import Days from "./Days";
 
+import TaskForm from "../tasks/TaskForm";
+
 import Modal from "../common/Modal";
 
 import { getDaysList } from "../../utils/calendar";
@@ -54,7 +56,11 @@ const Calendar: FC = () => {
 
 			<Days daysList={daysList} setTasks={setTasks} onModalOpen={onModalOpen} />
 
-			{isOpenModal && <Modal onModalClose={onModalClose}>hello modal</Modal>}
+			{isOpenModal && (
+				<Modal onModalClose={onModalClose}>
+					<TaskForm />
+				</Modal>
+			)}
 		</CalendarStyled>
 	);
 };

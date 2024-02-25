@@ -52,6 +52,17 @@ button {
 	border: none;
 }
 
+.hidden {
+	height: 1px;
+	width: 1px;
+	position: absolute;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0 0 0 0);
+	overflow: hidden;
+}
+
 @keyframes animateDots {
 	0% {
 		transform: scale(1);
