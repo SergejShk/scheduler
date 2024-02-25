@@ -11,12 +11,23 @@ import { labelColors } from "../../utils/constants";
 import { ITaskFormValues } from "../../interfaces/calendar";
 
 interface IProps {
+	initialTask?: ITaskFormValues;
 	isLoading: boolean;
 	onSaveClick: (values: ITaskFormValues) => void;
 }
 
-const TaskForm: FC<IProps> = ({ isLoading, onSaveClick }) => {
-	const { control, register, handleSubmit } = useForm<ITaskFormValues>();
+const TaskForm: FC<IProps> = ({ initialTask, isLoading, onSaveClick }) => {
+	const {
+		control,
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<ITaskFormValues>({
+		defaultValues: {
+			labels: initialTask?.labels || [],
+			description: initialTask?.description || "",
+		},
+	});
 
 	const descriptionValue = useWatch({
 		name: "description",
@@ -36,7 +47,17 @@ const TaskForm: FC<IProps> = ({ isLoading, onSaveClick }) => {
 			</LabelsList>
 
 			<BlockTitle>Description</BlockTitle>
-			<Textarea name="description" register={register} value={descriptionValue} placeholder="Type..." />
+
+			<TextareaWrapper>
+				<Textarea
+					name="description"
+					register={register}
+					rules={{ required: { value: true, message: "Required" } }}
+					value={descriptionValue}
+					placeholder="Type..."
+				/>
+				{errors?.description && <ErrorText role="alert">{errors?.description?.message}</ErrorText>}
+			</TextareaWrapper>
 
 			<ButtonWrapper>
 				<Button disabled={isLoading}>Save</Button>
@@ -80,4 +101,17 @@ const BlockTitle = styled.p`
 const ButtonWrapper = styled.div`
 	display: flex;
 	justify-content: center;
+`;
+
+const TextareaWrapper = styled.div`
+	position: relative;
+`;
+
+const ErrorText = styled.span`
+	position: absolute;
+	left: 0;
+	bottom: -10px;
+	font-size: 10px;
+	color: #e73f3f;
+	font-weight: 400;
 `;

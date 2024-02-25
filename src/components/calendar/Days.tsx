@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, MouseEvent, useState } from "react";
 import styled from "styled-components";
 
 import { weekDays } from "../../utils/constants";
@@ -8,7 +8,7 @@ import { ICardDay, ITask } from "../../interfaces/calendar";
 interface IProps {
 	daysList: ICardDay[];
 	setTasks: React.Dispatch<React.SetStateAction<ITask[]>>;
-	onModalOpen: (cardId: string) => void;
+	onModalOpen: (e: MouseEvent<HTMLElement>, card: ICardDay) => void;
 }
 
 const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
@@ -122,7 +122,7 @@ const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 					<DaysItem
 						key={id}
 						id={id}
-						onClick={() => onModalOpen(id)}
+						onClick={(e) => onModalOpen(e, { id, title, tasks })}
 						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
 						onDragOver={handleDragOver}
 					>
@@ -140,13 +140,15 @@ const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 									onDragOver={handleDragOver}
 								>
 									{task.labels.length > 0 && (
-										<LabelList>
+										<LabelList id={task.id}>
 											{task.labels.map((label) => (
-												<LabelItem key={label} className="task" color={label} />
+												<LabelItem key={label} className="task" id={task.id} color={label} />
 											))}
 										</LabelList>
 									)}
-									<p className="task">{task.description}</p>
+									<p className="task" id={task.id}>
+										{task.description}
+									</p>
 								</TaskItem>
 							))}
 						</TaskList>
