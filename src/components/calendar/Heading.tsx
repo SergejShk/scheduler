@@ -7,6 +7,7 @@ import { useLogOut } from "../../hooks/mutations/auth/useLogout";
 
 import { filterItems } from "../../utils/constants";
 import { getTasksFromDaysList } from "../../utils/tasks";
+import { generatePDF } from "../../utils/generatePDF";
 
 import { ICardDay } from "../../interfaces/calendar";
 
@@ -14,6 +15,7 @@ interface IProps {
 	daysList: ICardDay[];
 	currentDate: string;
 	selectedFilter: string[];
+	calendarRef: React.MutableRefObject<null>;
 	prevMonthClick: () => void;
 	nextMonthClick: () => void;
 	updateSearchValue: (value: string) => void;
@@ -24,6 +26,7 @@ const Heading: FC<IProps> = ({
 	daysList,
 	currentDate,
 	selectedFilter,
+	calendarRef,
 	prevMonthClick,
 	nextMonthClick,
 	updateSearchValue,
@@ -89,9 +92,14 @@ const Heading: FC<IProps> = ({
 
 			<CurrentDate>{currentDate}</CurrentDate>
 
-			<button type="button" onClick={exportData}>
-				Export JSON
-			</button>
+			<ExportBlock>
+				<ExportButton type="button" onClick={exportData}>
+					Export JSON
+				</ExportButton>
+				<ExportButton type="button" onClick={() => generatePDF(calendarRef)}>
+					Export PDF
+				</ExportButton>
+			</ExportBlock>
 
 			<LogOutBtn type="button" onClick={handleLogOutClick} disabled={isPendingLogOut}>
 				Log out
@@ -136,7 +144,7 @@ const NextArrow = styled(PrevArrow)`
 `;
 
 const CurrentDate = styled.p`
-	min-width: 250px;
+	width: calc(100% - 845px);
 	font-size: 24px;
 	font-weight: 500;
 	text-align: center;
@@ -148,8 +156,8 @@ const LogOutBtn = styled.button`
 	font-weight: 500;
 	border-style: none;
 	background-color: transparent;
-	margin-left: auto;
 	text-decoration: underline;
+	margin-bottom: 4px;
 
 	&:disabled {
 		cursor: auto;
@@ -190,4 +198,13 @@ const Chevron = styled.div<{ $isOpenDropdown: boolean }>`
 	background-position: center center;
 	background-repeat: no-repeat;
 	transform: ${({ $isOpenDropdown }) => ($isOpenDropdown ? "rotate(90deg)" : "rotate(-90deg)")};
+`;
+
+const ExportBlock = styled.div`
+	margin-left: auto;
+`;
+
+const ExportButton = styled.button`
+	font-size: 18px;
+	margin-right: 25px;
 `;

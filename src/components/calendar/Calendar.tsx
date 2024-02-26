@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, MouseEvent, useMemo, useCallback } from "react";
+import { FC, useEffect, useState, MouseEvent, useMemo, useCallback, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import debounce from "lodash.debounce";
 import styled from "styled-components";
@@ -18,7 +18,13 @@ import { updateTasksApi } from "../../services/tasks/updateTasks";
 import { useGetTasks } from "../../hooks/mutations/tasks/useGetTasks";
 
 import { getDaysList } from "../../utils/calendar";
-import { addTaskToCard, findTaskFromCard, getTasksFromDaysList, updateTaskInCard } from "../../utils/tasks";
+import {
+	addTaskToCard,
+	findTaskFromCard,
+	getTasksFromDaysList,
+	joinAllTasks,
+	updateTaskInCard,
+} from "../../utils/tasks";
 import { labelColors, monthes } from "../../utils/constants";
 
 import { ICardDay, ITask, ITaskFormValues } from "../../interfaces/calendar";
@@ -38,6 +44,8 @@ const Calendar: FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [clickedCard, setClickedCard] = useState<ICardDay | null>(null);
 	const [editTaskId, setEditTaskId] = useState("");
+
+	const calendarRef = useRef(null);
 
 	useEffect(() => {
 		getTasks();
@@ -105,18 +113,20 @@ const Calendar: FC = () => {
 	const updateTasksInDb = (updatedDaysList: ICardDay[]) => {
 		if (!tasksData?.data.id) return;
 
-		const tasks = getTasksFromDaysList(updatedDaysList);
+		const tasksFromDaysList = getTasksFromDaysList(updatedDaysList);
+		const updatedTasksForDb = joinAllTasks(tasksFromDaysList, tasks);
 
 		const payload = {
 			id: tasksData?.data.id,
 			userId: auth.id,
-			tasks,
+			tasks: updatedTasksForDb,
 		};
 
 		setIsLoading(true);
 		updateTasksApi(payload)
 			.then(() => {
 				setDaysList(updatedDaysList);
+				setTasks(updatedTasksForDb);
 				onModalClose();
 			})
 			.catch((err) => console.log(err))
@@ -184,14 +194,17 @@ const Calendar: FC = () => {
 			<Heading
 				daysList={daysList}
 				currentDate={`${monthes[currentMonth]} ${currentYear}`}
-				prevMonthClick={prevMonthClick}
-				nextMonthClick={nextMonthClick}
 				updateSearchValue={updateSearchValue}
 				selectedFilter={selectedFilter}
+				calendarRef={calendarRef}
+				prevMonthClick={prevMonthClick}
+				nextMonthClick={nextMonthClick}
 				handleFilter={handleFilter}
 			/>
 
-			<Days daysList={daysList} onModalOpen={onModalOpen} updateTasksInDb={updateTasksInDb} />
+			<div ref={calendarRef}>
+				<Days daysList={daysList} onModalOpen={onModalOpen} updateTasksInDb={updateTasksInDb} />
+			</div>
 
 			{isOpenModal && (
 				<Modal onModalClose={onModalClose}>

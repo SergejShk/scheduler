@@ -34,3 +34,20 @@ export const updateTaskInCard = (daysList: ICardDay[], task: ITask, dayId: strin
 		}
 		return day;
 	});
+
+export const joinAllTasks = (tasksFromDaysList: ITask[], currentTasks: ITask[]) => {
+	const allTasks = [...currentTasks, ...tasksFromDaysList];
+
+	const updatedTasks = allTasks.reduce((acc: ITask[], task) => {
+		const taskFromList = tasksFromDaysList.find((t) => t.id === task.id);
+		const taskExistedInAcc = acc.find((t) => t.id === taskFromList?.id);
+
+		if (taskExistedInAcc || taskFromList) {
+			return [...acc];
+		}
+
+		return [...acc, task];
+	}, []);
+
+	return [...updatedTasks, ...tasksFromDaysList];
+};
