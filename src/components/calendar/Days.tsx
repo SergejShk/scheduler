@@ -7,11 +7,11 @@ import { ICardDay, ITask } from "../../interfaces/calendar";
 
 interface IProps {
 	daysList: ICardDay[];
-	setTasks: React.Dispatch<React.SetStateAction<ITask[]>>;
 	onModalOpen: (e: MouseEvent<HTMLElement>, card: ICardDay) => void;
+	updateTasksInDb: (updatedDaysList: ICardDay[]) => void;
 }
 
-const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
+const Days: FC<IProps> = ({ daysList, onModalOpen, updateTasksInDb }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
@@ -67,11 +67,7 @@ const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 			return day;
 		});
 
-		const updatedTasks = updatedDaysList.reduce((acc: ITask[], day: ICardDay) => {
-			return [...acc, ...day.tasks];
-		}, []);
-
-		setTasks(updatedTasks);
+		updateTasksInDb(updatedDaysList);
 	};
 
 	const handleDropBoard = (e: React.DragEvent<HTMLLIElement>, taskList: ICardDay) => {
@@ -99,11 +95,7 @@ const Days: FC<IProps> = ({ daysList, setTasks, onModalOpen }) => {
 			return day;
 		});
 
-		const updatedTasks = updatedDaysList.reduce((acc: ITask[], day: ICardDay) => {
-			return [...acc, ...day.tasks];
-		}, []);
-
-		setTasks(updatedTasks);
+		updateTasksInDb(updatedDaysList);
 	};
 
 	const handleDragOver = (e: React.DragEvent<HTMLLIElement>) => {

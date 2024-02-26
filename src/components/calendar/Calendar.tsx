@@ -20,7 +20,7 @@ import { getDaysList } from "../../utils/calendar";
 import { addTaskToCard, findTaskFromCard, getTasksFromDaysList, updateTaskInCard } from "../../utils/tasks";
 import { monthes } from "../../utils/constants";
 
-import { ICardDay, ITask, ITaskFormValues } from "../../interfaces/calendar";
+import { ICardDay, ITaskFormValues } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
 	const { auth } = useAuthContext();
@@ -28,7 +28,6 @@ const Calendar: FC = () => {
 	const { mutate: logOut, isPending: isPendingLogOut } = useLogOut();
 	const { mutate: getTasks, data: tasksData, isPending: isPendingTasks } = useGetTasks();
 
-	const [tasks, setTasks] = useState<ITask[]>([]);
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 	const [daysList, setDaysList] = useState<ICardDay[]>([]);
@@ -42,14 +41,9 @@ const Calendar: FC = () => {
 	}, []);
 
 	useEffect(() => {
-		if (!tasksData?.data) return;
-
-		setTasks(tasksData.data.tasks);
-	}, [tasksData]);
-
-	useEffect(() => {
+		const tasks = tasksData?.data.tasks || [];
 		setDaysList(getDaysList({ currentYear, currentMonth, tasks }));
-	}, [currentYear, currentMonth, tasks]);
+	}, [currentYear, currentMonth, tasksData]);
 
 	const taskToUpdate = useMemo(() => {
 		if (!clickedCard) return;
@@ -160,7 +154,7 @@ const Calendar: FC = () => {
 				</LogOutBtn>
 			</Heading>
 
-			<Days daysList={daysList} setTasks={setTasks} onModalOpen={onModalOpen} />
+			<Days daysList={daysList} onModalOpen={onModalOpen} updateTasksInDb={updateTasksInDb} />
 
 			{isOpenModal && (
 				<Modal onModalClose={onModalClose}>
