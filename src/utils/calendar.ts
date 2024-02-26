@@ -1,6 +1,6 @@
 import { shortMonthes } from "./constants";
 
-import { ICardDay, IGetCardDaysList, ITask } from "../interfaces/calendar";
+import { ICardDay, IGetCardDaysList, IHolday, ITask } from "../interfaces/calendar";
 
 export const getDaysOfPrevMonth = (
 	firstDayOfMonth: number,
@@ -96,4 +96,11 @@ export const getDaysList = ({ currentYear, currentMonth, tasks }: IGetCardDaysLi
 		...getDaysOfCurrentMonth(lastDateOfMonth, currentYear, currentMonth, tasks),
 		...getDaysOfNextMonth(lastDayOfMonth, nextMonth, currentYear, tasks),
 	];
+};
+
+export const normalizeHolidays = (holidays: IHolday[]) => {
+	return holidays.map((holiday) => ({
+		...holiday,
+		date: new Date(holiday.date).toLocaleDateString(),
+	}));
 };

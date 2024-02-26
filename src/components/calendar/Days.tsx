@@ -3,15 +3,16 @@ import styled from "styled-components";
 
 import { weekDays } from "../../utils/constants";
 
-import { ICardDay, ITask } from "../../interfaces/calendar";
+import { ICardDay, IHolday, ITask } from "../../interfaces/calendar";
 
 interface IProps {
 	daysList: ICardDay[];
+	holidays: IHolday[] | null;
 	onModalOpen: (e: MouseEvent<HTMLElement>, card: ICardDay) => void;
 	updateTasksInDb: (updatedDaysList: ICardDay[]) => void;
 }
 
-const Days: FC<IProps> = ({ daysList, onModalOpen, updateTasksInDb }) => {
+const Days: FC<IProps> = ({ daysList, holidays, onModalOpen, updateTasksInDb }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
@@ -102,6 +103,13 @@ const Days: FC<IProps> = ({ daysList, onModalOpen, updateTasksInDb }) => {
 		e.preventDefault();
 	};
 
+	const getHoliday = (date: string) => {
+		if (!holidays) return "";
+		const holiday = holidays.find((h) => h.date === date);
+
+		return holiday?.name || "";
+	};
+
 	return (
 		<DaysStyled>
 			<WeekDaysList>
@@ -118,7 +126,10 @@ const Days: FC<IProps> = ({ daysList, onModalOpen, updateTasksInDb }) => {
 						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
 						onDragOver={handleDragOver}
 					>
-						<p>{title}</p>
+						<TitleBlock>
+							<p>{title}</p>
+							<Holiday>{getHoliday(id)}</Holiday>
+						</TitleBlock>
 
 						<TaskList>
 							{tasks.map((task) => (
@@ -229,4 +240,15 @@ const Description = styled.p`
 	&::-webkit-scrollbar {
 		display: none;
 	}
+`;
+
+const TitleBlock = styled.div`
+	display: flex;
+	align-items: flex-start;
+	gap: 5px;
+`;
+
+const Holiday = styled.p`
+	color: #be2e2e;
+	font-weight: 500;
 `;

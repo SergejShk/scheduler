@@ -27,3 +27,15 @@ export interface IUpdateTasksBody {
 	tasks: ITask[];
 	userId: number;
 }
+
+export interface IHolday {
+	counties: string[] | null;
+	countryCode: string | null;
+	date: string;
+	fixed: boolean;
+	global: boolean;
+	launchYear: number | null;
+	localName: string | null;
+	name: string | null;
+	types: string[] | null;
+}

@@ -14,10 +14,11 @@ import Modal from "../common/Modal";
 import { useAuthContext } from "../../context/AuthContext";
 
 import { updateTasksApi } from "../../services/tasks/updateTasks";
+import { getHolidaysApi } from "../../services/holidays/getHolidays";
 
 import { useGetTasks } from "../../hooks/mutations/tasks/useGetTasks";
 
-import { getDaysList } from "../../utils/calendar";
+import { getDaysList, normalizeHolidays } from "../../utils/calendar";
 import {
 	addTaskToCard,
 	findTaskFromCard,
@@ -27,7 +28,7 @@ import {
 } from "../../utils/tasks";
 import { labelColors, monthes } from "../../utils/constants";
 
-import { ICardDay, ITask, ITaskFormValues } from "../../interfaces/calendar";
+import { ICardDay, IHolday, ITask, ITaskFormValues } from "../../interfaces/calendar";
 
 const Calendar: FC = () => {
 	const { auth } = useAuthContext();
@@ -44,12 +45,22 @@ const Calendar: FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [clickedCard, setClickedCard] = useState<ICardDay | null>(null);
 	const [editTaskId, setEditTaskId] = useState("");
+	const [holidays, setHolidays] = useState<IHolday[] | null>(null);
 
 	const calendarRef = useRef(null);
 
 	useEffect(() => {
 		getTasks();
 	}, []);
+
+	useEffect(() => {
+		getHolidaysApi(currentYear)
+			.then((holidays) => {
+				const normalizedHolidays = normalizeHolidays(holidays);
+				setHolidays(normalizedHolidays);
+			})
+			.catch((error) => console.log(error));
+	}, [currentYear]);
 
 	useEffect(() => {
 		if (!tasksData?.data) return;
@@ -203,7 +214,12 @@ const Calendar: FC = () => {
 			/>
 
 			<div ref={calendarRef}>
-				<Days daysList={daysList} onModalOpen={onModalOpen} updateTasksInDb={updateTasksInDb} />
+				<Days
+					daysList={daysList}
+					holidays={holidays}
+					onModalOpen={onModalOpen}
+					updateTasksInDb={updateTasksInDb}
+				/>
 			</div>
 
 			{isOpenModal && (
