@@ -5,17 +5,21 @@ import styled from "styled-components";
 type CheckboxProps<TFormValues extends FieldValues> = {
 	name: Path<TFormValues>;
 	rules?: RegisterOptions;
+	width?: string;
+	height?: string;
 	register?: UseFormRegister<TFormValues>;
 } & Omit<DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, "size" | "ref">;
 
 const Checkbox = <TFormValues extends FieldValues>({
 	name,
+	width,
+	height,
 	rules,
 	register,
 	...props
 }: CheckboxProps<TFormValues>) => {
 	return (
-		<CheckboxStyled>
+		<CheckboxStyled $width={width} $height={height}>
 			<input
 				type="checkbox"
 				name={name}
@@ -30,10 +34,10 @@ const Checkbox = <TFormValues extends FieldValues>({
 
 export default Checkbox;
 
-const CheckboxStyled = styled.label`
+const CheckboxStyled = styled.label<{ $width?: string; $height?: string }>`
 	display: block;
-	width: 20px;
-	height: 20px;
+	width: ${({ $width }) => $width || "20px"};
+	height: ${({ $height }) => $height || "20px"};
 	border-radius: 4px;
 	border: 1px solid #ccc;
 

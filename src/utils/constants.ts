@@ -72,6 +72,15 @@ export const days = [
 
 export const labelColors = ["green", "yellow", "orange", "blue", "purple", "red"];
 
+export const filterItems = [
+	{ key: "green", label: "green" },
+	{ key: "yellow", label: "yellow" },
+	{ key: "orange", label: "orange" },
+	{ key: "blue", label: "blue" },
+	{ key: "purple", label: "purple" },
+	{ key: "red", label: "red" },
+];
+
 export const fakeTasks: ITask[] = [
 	{ id: "1", date: "02/02/2024", description: "task 1", labels: ["green"] },
 	{ id: "2", date: "04/02/2024", description: "task 2", labels: ["yellow", "red"] },

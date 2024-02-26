@@ -138,9 +138,9 @@ const Days: FC<IProps> = ({ daysList, onModalOpen, updateTasksInDb }) => {
 											))}
 										</LabelList>
 									)}
-									<p className="task" id={task.id}>
+									<Description className="task" id={task.id}>
 										{task.description}
-									</p>
+									</Description>
 								</TaskItem>
 							))}
 						</TaskList>
@@ -221,4 +221,12 @@ const LabelItem = styled.li<{ color: string }>`
 	height: 5px;
 	border-radius: 4px;
 	background-color: ${({ color }) => color};
+`;
+
+const Description = styled.p`
+	overflow: auto;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
 `;

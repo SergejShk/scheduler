@@ -19,7 +19,7 @@ import { useGetTasks } from "../../hooks/mutations/tasks/useGetTasks";
 
 import { getDaysList } from "../../utils/calendar";
 import { addTaskToCard, findTaskFromCard, getTasksFromDaysList, updateTaskInCard } from "../../utils/tasks";
-import { monthes } from "../../utils/constants";
+import { labelColors, monthes } from "../../utils/constants";
 
 import { ICardDay, ITask, ITaskFormValues } from "../../interfaces/calendar";
 
@@ -29,6 +29,7 @@ const Calendar: FC = () => {
 	const { mutate: getTasks, data: tasksData, isPending: isPendingTasks } = useGetTasks();
 
 	const [searchValue, setSearchValue] = useState("");
+	const [selectedFilter, setSelectedFilter] = useState<string[]>(labelColors);
 	const [tasks, setTasks] = useState<ITask[]>([]);
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
@@ -148,12 +149,31 @@ const Calendar: FC = () => {
 		updateTasksInDb(updatedDaysList);
 	};
 
+	const handleFilter = (keys: string[]) => {
+		setSelectedFilter(keys);
+	};
+
 	useEffect(() => {
 		if (!tasksData?.data) return;
 
 		const searchedTasks = tasksData.data.tasks.filter((task) => task.description.includes(searchValue));
 		setTasks(searchedTasks);
 	}, [searchValue, tasksData]);
+
+	useEffect(() => {
+		if (!tasksData?.data) return;
+
+		const searchedTasks = tasksData.data.tasks.filter((task) => {
+			let updTask = [];
+			selectedFilter.forEach((filter) => {
+				if (task.labels.includes(filter)) {
+					updTask.push(task);
+				}
+			});
+			return updTask.length > 0;
+		});
+		setTasks(searchedTasks);
+	}, [selectedFilter, tasksData]);
 
 	if (isPendingTasks) {
 		<Loader />;
@@ -166,6 +186,8 @@ const Calendar: FC = () => {
 				prevMonthClick={prevMonthClick}
 				nextMonthClick={nextMonthClick}
 				updateSearchValue={updateSearchValue}
+				selectedFilter={selectedFilter}
+				handleFilter={handleFilter}
 			/>
 
 			<Days daysList={daysList} onModalOpen={onModalOpen} updateTasksInDb={updateTasksInDb} />

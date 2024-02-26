@@ -1,17 +1,43 @@
-import { FC, ChangeEvent } from "react";
+import { FC, ChangeEvent, useRef, useState } from "react";
 import styled from "styled-components";
+
+import FilterDropdown from "./FilterDropdown";
 
 import { useLogOut } from "../../hooks/mutations/auth/useLogout";
 
+import { filterItems } from "../../utils/constants";
+
 interface IProps {
 	currentDate: string;
+	selectedFilter: string[];
 	prevMonthClick: () => void;
 	nextMonthClick: () => void;
 	updateSearchValue: (value: string) => void;
+	handleFilter: (keys: string[]) => void;
 }
 
-const Heading: FC<IProps> = ({ currentDate, prevMonthClick, nextMonthClick, updateSearchValue }) => {
+const Heading: FC<IProps> = ({
+	currentDate,
+	selectedFilter,
+	prevMonthClick,
+	nextMonthClick,
+	updateSearchValue,
+	handleFilter,
+}) => {
+	const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+	const [isReset, setIsReset] = useState(false);
+
+	const filterIconRef = useRef(null);
+
 	const { mutate: logOut, isPending: isPendingLogOut } = useLogOut();
+
+	const onIconClick = () => {
+		if (isOpenDropdown) {
+			setIsReset(true);
+		}
+
+		setIsOpenDropdown((prev) => !prev);
+	};
 
 	const handleLogOutClick = () => {
 		logOut();
@@ -25,6 +51,21 @@ const Heading: FC<IProps> = ({ currentDate, prevMonthClick, nextMonthClick, upda
 		<HeadingStyled>
 			<ActionBlock>
 				<InputSearch type="text" placeholder="Search..." onChange={handleSearchInputChange} />
+
+				<FilterBlock>
+					<p>Filter by label</p>
+					<Chevron ref={filterIconRef} $isOpenDropdown={isOpenDropdown} onClick={onIconClick} />
+					<FilterDropdown
+						iconRef={filterIconRef}
+						filterItems={filterItems}
+						isOpen={isOpenDropdown}
+						setIsOpen={setIsOpenDropdown}
+						defaultSelectedItems={selectedFilter}
+						onFilter={handleFilter}
+						isReset={isReset}
+						setIsReset={setIsReset}
+					/>
+				</FilterBlock>
 
 				<PrevArrow type="button" onClick={prevMonthClick} />
 				<NextArrow type="button" onClick={nextMonthClick} />
@@ -104,10 +145,29 @@ const InputSearch = styled.input`
 	color: #484848;
 	outline: none;
 	padding: 6px;
-	margin-right: 10px;
+	margin-right: 25px;
 
 	&:hover,
 	&:focus {
 		border-color: #4c758b;
 	}
+`;
+
+const FilterBlock = styled.div`
+	position: relative;
+	display: flex;
+	align-items: center;
+	font-size: 18px;
+	margin-right: 25px;
+`;
+
+const Chevron = styled.div<{ $isOpenDropdown: boolean }>`
+	width: 30px;
+	height: 30px;
+	cursor: pointer;
+	background-image: url("/icons/nav-arrow.svg");
+	background-size: contain;
+	background-position: center center;
+	background-repeat: no-repeat;
+	transform: ${({ $isOpenDropdown }) => ($isOpenDropdown ? "rotate(90deg)" : "rotate(-90deg)")};
 `;
