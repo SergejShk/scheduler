@@ -182,6 +182,7 @@ const Calendar: FC = () => {
 	return (
 		<CalendarStyled>
 			<Heading
+				daysList={daysList}
 				currentDate={`${monthes[currentMonth]} ${currentYear}`}
 				prevMonthClick={prevMonthClick}
 				nextMonthClick={nextMonthClick}

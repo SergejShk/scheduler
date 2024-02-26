@@ -6,8 +6,12 @@ import FilterDropdown from "./FilterDropdown";
 import { useLogOut } from "../../hooks/mutations/auth/useLogout";
 
 import { filterItems } from "../../utils/constants";
+import { getTasksFromDaysList } from "../../utils/tasks";
+
+import { ICardDay } from "../../interfaces/calendar";
 
 interface IProps {
+	daysList: ICardDay[];
 	currentDate: string;
 	selectedFilter: string[];
 	prevMonthClick: () => void;
@@ -17,6 +21,7 @@ interface IProps {
 }
 
 const Heading: FC<IProps> = ({
+	daysList,
 	currentDate,
 	selectedFilter,
 	prevMonthClick,
@@ -47,6 +52,17 @@ const Heading: FC<IProps> = ({
 		updateSearchValue(e.target.value);
 	};
 
+	const exportData = () => {
+		const data = getTasksFromDaysList(daysList);
+
+		const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(JSON.stringify(data))}`;
+		const link = document.createElement("a");
+		link.href = jsonString;
+		link.download = "data.json";
+
+		link.click();
+	};
+
 	return (
 		<HeadingStyled>
 			<ActionBlock>
@@ -72,6 +88,10 @@ const Heading: FC<IProps> = ({
 			</ActionBlock>
 
 			<CurrentDate>{currentDate}</CurrentDate>
+
+			<button type="button" onClick={exportData}>
+				Export JSON
+			</button>
 
 			<LogOutBtn type="button" onClick={handleLogOutClick} disabled={isPendingLogOut}>
 				Log out
