@@ -8,11 +8,12 @@ import { ICardDay, IHolday, ITask } from "../../interfaces/calendar";
 interface IProps {
 	daysList: ICardDay[];
 	holidays: IHolday[] | null;
+	currentMonth: number;
 	onModalOpen: (e: MouseEvent<HTMLElement>, card: ICardDay) => void;
 	updateTasksInDb: (updatedDaysList: ICardDay[]) => void;
 }
 
-const Days: FC<IProps> = ({ daysList, holidays, onModalOpen, updateTasksInDb }) => {
+const Days: FC<IProps> = ({ daysList, holidays, currentMonth, onModalOpen, updateTasksInDb }) => {
 	const [currentTaskList, setCurrentTaskList] = useState<ICardDay | null>(null);
 	const [currentTask, setCurrentTask] = useState<ITask | null>(null);
 
@@ -110,6 +111,12 @@ const Days: FC<IProps> = ({ daysList, holidays, onModalOpen, updateTasksInDb }) 
 		return holiday?.name || "";
 	};
 
+	const isCurrentMonth = (date: string) => {
+		const month = date.split("/")[1];
+
+		return currentMonth + 1 !== Number(month);
+	};
+
 	return (
 		<DaysStyled>
 			<WeekDaysList>
@@ -125,6 +132,7 @@ const Days: FC<IProps> = ({ daysList, holidays, onModalOpen, updateTasksInDb }) 
 						onClick={(e) => onModalOpen(e, { id, title, tasks })}
 						onDrop={(e) => handleDropBoard(e, { id, title, tasks })}
 						onDragOver={handleDragOver}
+						$isInactive={isCurrentMonth(id)}
 					>
 						<TitleBlock>
 							<p>{title}</p>

@@ -217,6 +217,7 @@ const Calendar: FC = () => {
 				<Days
 					daysList={daysList}
 					holidays={holidays}
+					currentMonth={currentMonth}
 					onModalOpen={onModalOpen}
 					updateTasksInDb={updateTasksInDb}
 				/>
