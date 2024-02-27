@@ -7,7 +7,7 @@ import { useLogOut } from "../../hooks/mutations/auth/useLogout";
 
 import { filterItems } from "../../utils/constants";
 import { getTasksFromDaysList } from "../../utils/tasks";
-import { generatePDF } from "../../utils/generatePDF";
+import { generateImg } from "../../utils/generateImg";
 
 import { ICardDay } from "../../interfaces/calendar";
 
@@ -96,8 +96,8 @@ const Heading: FC<IProps> = ({
 				<ExportButton type="button" onClick={exportData}>
 					Export JSON
 				</ExportButton>
-				<ExportButton type="button" onClick={() => generatePDF(calendarRef)}>
-					Export PDF
+				<ExportButton type="button" onClick={() => generateImg(calendarRef)}>
+					Save PNG
 				</ExportButton>
 			</ExportBlock>
 

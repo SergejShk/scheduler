@@ -243,17 +243,14 @@ const LabelItem = styled.li<{ color: string }>`
 `;
 
 const Description = styled.p`
-	overflow: auto;
-
-	&::-webkit-scrollbar {
-		display: none;
-	}
+	margin-bottom: 10px;
 `;
 
 const TitleBlock = styled.div`
 	display: flex;
 	align-items: flex-start;
 	gap: 5px;
+	margin-bottom: 5px;
 `;
 
 const Holiday = styled.p`
